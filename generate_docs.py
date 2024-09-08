@@ -400,7 +400,8 @@ if __name__ == '__main__':
             class_path = Path('')
             base_class = class_info.extends
             while True:
-                if base_class.endswith('.gd'):
+                if base_class.replace('"', '').replace("'", '').endswith('.gd'):
+                    base_class = base_class.replace('"', '').replace("'", '')
                     base_class = base_class.removeprefix('res://').replace('/', '-')
 
                 class_path = Path(base_class).joinpath(class_path)
