@@ -11,9 +11,15 @@
     {%- endfor -%}
 {%- endmacro -%}
 
+{# If you want to have a name header, uncomment this line:
+# {{name}}
+#}
+
 `{{file_path}}`
 
 *extends `{{extends}}`*
+
+___ 
 
 {% if summary is not none %}
 **{{summary}}**
