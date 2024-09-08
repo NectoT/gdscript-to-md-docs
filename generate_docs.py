@@ -351,6 +351,14 @@ if __name__ == '__main__':
         default=Path(sys.argv[0]).parent.joinpath('class_doc_template.md'),
     )
     arg_parser.add_argument(
+        '-s', '--script-templates',
+        help=(
+            'Path to script templates directory relative to project directory. '
+            'Default value is "script_templates"'
+        ),
+        default=Path('script_templates')
+    )
+    arg_parser.add_argument(
         '-n', '--named-only',
         help='Restricts parsing to only named classes',
         action='store_true'
@@ -383,8 +391,9 @@ if __name__ == '__main__':
 
     class_infos: dict[str, ClassInfo] = {}
     addons_dir = project_dir.joinpath('addons')
+    script_templates_dir = project_dir.joinpath(args.script_templates)
     for script_path in project_dir.rglob('*.gd'):
-        if addons_dir in script_path.parents:
+        if addons_dir in script_path.parents or script_templates_dir in script_path.parents:
             continue
 
         class_info: ClassInfo = ClassInfo.parse_from_script(script_path.relative_to(project_dir))
