@@ -30,9 +30,9 @@
 
 {% for signal in signals|sort(attribute='name') %}
 {% if signal.args|length != 0 %}
-### - {{signal.name}}({{definition_args(signal.args)}})
+### {{signal.name}}({{definition_args(signal.args)}})
 {% else %}
-### - {{signal.name}}
+### {{signal.name}}
 {% endif %}
 
 {{signal.description if signal.description is not none else ""}}
@@ -48,7 +48,7 @@
 {{- enum.description if enum.description else "" }}
 
 {% for value in enum.vals %}
-- #### {{value}}
+- **{{value}}**
 
 {{ enum.vals[value] if enum.vals[value] else "" }}
 
@@ -61,7 +61,7 @@
 ## Properties
 
 {% for property in properties|sort(attribute='name') %}
-- ### `{{property.type if property.type else "Variant"}}` {{property.name}}
+### `{{property.type if property.type else "Variant"}}` {{property.name}}
 {%- if property.default is not none -%}
     {{" "}}= {{property.default}}
 {% endif %}
@@ -74,7 +74,7 @@
 ## Methods
 
 {% for method in methods|sort(attribute='name') %}
-- ### `{{method.type if method.type else "void"}}` {{method.name}}({{definition_args(method.args)}})
+### `{{method.type if method.type else "void"}}` {{method.name}}({{definition_args(method.args)}})
 
 {{method.description if method.description else ""}}
 {% endfor %}
