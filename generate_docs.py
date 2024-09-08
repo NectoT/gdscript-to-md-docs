@@ -382,7 +382,11 @@ if __name__ == '__main__':
         md_template = jinja_env.from_string(md_template_file.read())
 
     class_infos: dict[str, ClassInfo] = {}
+    addons_dir = project_dir.joinpath('addons')
     for script_path in project_dir.rglob('*.gd'):
+        if addons_dir in script_path.parents:
+            continue
+
         class_info: ClassInfo = ClassInfo.parse_from_script(script_path.relative_to(project_dir))
         if class_info.name is not None:
             class_infos[class_info.name] = class_info
