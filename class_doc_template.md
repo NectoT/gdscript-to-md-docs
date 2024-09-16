@@ -72,6 +72,11 @@ ___
     {{" "}}= {{property.default}}
 {% endif %}
 
+{% if property.has_setter %}*has setter* {% endif %}
+{% if property.has_setter and property.has_getter %}*,*{% endif %}
+{% if property.has_getter %} *has getter*{% endif %}
+
+
 {{property.description if property.description else ""}}
 {% endfor %}
 {% endif %}
