@@ -38,8 +38,17 @@ class PropertyInfo:
     type: str | None
     description: str | None
     default: str | None
-    is_setter: bool = False
-    is_getter: bool = False
+    has_setter: bool = False
+    has_getter: bool = False
+
+    @staticmethod
+    def _parse_inline_getset(info: 'PropertyInfo', text: str):
+        # Separate functions syntax
+        if len(re.findall(r'\s*set\s*=\s*(\w+)', text)) > 0:
+            info.has_setter = True
+        if len(re.findall(r'\s*get\s*=\s*(\w+)', text)) > 0:
+            info.has_getter = True
+        
 
     @staticmethod
     def parse_from_script(
@@ -51,35 +60,43 @@ class PropertyInfo:
         '''
         Parses property from the script file. curr_line is the last string read from the file
         with any annotation removed. Consumes all lines needed for full parsing
-        '''
-        colon_idx = curr_line.find(':')
-        if onready or '=' not in curr_line:
+        ''' 
+
+        name, type_hint, assign_op, default, setget_def = re.match(
+            r'var\s+(\w+)(?:\s*\:\s*(?![gs]et\s*=)(\w+))?(?:\s*(\:?\s*\=)\s*(\w+))?\s*(?::(.+))?',
+            curr_line
+        ).groups()
+
+        if onready:
             default = None
-        else:
-            default = curr_line.split('=')[1].strip().replace(':', '')
+
+        if default is not None:
             if default[0] == '{':
                 default = '{}' if default[0:default.find('}')].isspace() else '{...}'
             elif default[0] == '[':
                 default = '[]' if default[0:default.find(']')].isspace() else '[...]'
-        
+
         info = PropertyInfo(
-            name=curr_line.split()[1].replace(':', ''),
-            type=curr_line[colon_idx + 1:curr_line.find('=')].strip() if colon_idx != -1 else None,
+            name=name,
+            type= type_hint,
             description=description,
             default=default
         )
 
-        if curr_line.rstrip()[-1] != ':':
-            return info
+        if setget_def is not None:
+            PropertyInfo._parse_inline_getset(info, setget_def)
 
         file_pos = script.tell()
         while line := script.readline():
             if not line[0].isspace():
                 break
+            
+            PropertyInfo._parse_inline_getset(info, line)
             if line.lstrip().startswith('set'):
-                info.is_setter = True
+                info.has_setter = True
             elif line.lstrip().startswith('get'):
-                info.is_getter = True
+                info.has_getter = True
+            
             file_pos = script.tell()
 
         
