@@ -194,16 +194,18 @@ class SignalInfo:
         with any annotation removed. Consumes all lines needed for full parsing
         '''
 
-        args_lines = curr_line
-        file_pos = script.tell()
-        while line := script.readline():
-            if args_lines.rstrip().endswith(')'):
-                break
-            args_lines += line.strip()
+        args = []
+        if '(' in curr_line:
+            args_lines = curr_line
             file_pos = script.tell()
-        script.seek(file_pos)
+            while line := script.readline():
+                if args_lines.rstrip().endswith(')'):
+                    break
+                args_lines += line.strip()
+                file_pos = script.tell()
+            script.seek(file_pos)
         
-        args = ArgInfo.parse_definition(args_lines)
+            args = ArgInfo.parse_definition(args_lines)
 
         return SignalInfo(
             name=curr_line[curr_line.find(' '):curr_line.find('(')].strip(),
